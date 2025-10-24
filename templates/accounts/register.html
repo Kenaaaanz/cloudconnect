@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudConnect - Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Copy your login page CSS here for consistent styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 440px;
+            overflow: hidden;
+            position: relative;
+            padding: 30px;
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #212529;
+            font-size: 14px;
+        }
+        .input-with-icon {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        .form-control {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            color: white;
+            box-shadow: 0 4px 14px rgba(67, 97, 238, 0.4);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.5);
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 480px) {
+            .auth-container {
+                border-radius: 15px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-wifi"></i>
+                </div>
+                <div class="logo-text">CloudConnect</div>
+            </div>
+            <h2>Create Account</h2>
+            <p>Sign up to get started with CloudConnect</p>
+        </div>
+        <form method="post" autocomplete="off">
+            {% csrf_token %}
+            {% if registration_form.errors %}
+                <div class="error-message">
+                    {{ registration_form.errors }}
+                </div>
+            {% endif %}
+            <!-- Render Django form fields with styling -->
+            <div class="form-group">
+                <label class="form-label" for="signup-username">Username</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user input-icon"></i>
+                    {{ registration_form.username }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signup-email">Email Address</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-envelope input-icon"></i>
+                    {{ registration_form.email }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signup-account">Company Account Number</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-id-card input-icon"></i>
+                    {{ registration_form.company_account_number }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signup-firstname">First Name</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user input-icon"></i>
+                    {{ registration_form.first_name }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signup-lastname">Last Name</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user input-icon"></i>
+                    {{ registration_form.last_name }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signup-phone">Phone Number</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-phone input-icon"></i>
+                    {{ registration_form.phone }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signup-accounttype">Account Type</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-users input-icon"></i>
+                    {{ registration_form.account_type }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signup-password">Password</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock input-icon"></i>
+                    {{ registration_form.password1 }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signup-confirm">Confirm Password</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock input-icon"></i>
+                    {{ registration_form.password2 }}
+                </div>
+            </div>
+            <button type="submit" class="btn">Create Account</button>
+        </form>
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</body>
+</html>

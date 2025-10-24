@@ -1,0 +1,51 @@
+<!-- templates/billing/plans.html -->
+{% extends 'base.html' %}
+
+{% block page_title %}Internet Plans{% endblock %}
+
+{% block content %}
+<div class="card p-6 mb-6">
+    <h2 class="text-2xl font-semibold mb-6">Available Internet Plans</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for plan in plans %}
+            <div class="border rounded-lg p-6 {% if subscription.plan.id == plan.id %}border-blue-500 bg-blue-50{% else %}border-gray-200{% endif %}">
+                <div class="text-center mb-4">
+                    <h3 class="text-xl font-semibold">{{ plan.name }}</h3>
+                    <p class="text-gray-600">{{ plan.description }}</p>
+                </div>
+                
+                <div class="text-center mb-6">
+                    <span class="text-3xl font-bold">Ksh {{ plan.price }}</span>
+                    <span class="text-gray-600">/{{ plan.billing_cycle }}</span>
+                </div>
+                
+                <ul class="space-y-3 mb-6">
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        <span>{{ plan.speed }} Speed</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        <span>{{ plan.data_limit|default:"Unlimited" }} Data</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        <span>24/7 Support</span>
+                    </li>
+                </ul>
+                
+                {% if subscription.plan.id == plan.id %}
+                    <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg">
+                        Current Plan
+                    </button>
+                {% else %}
+                    <a href="{% url 'initiate_payment' plan.id %}" class="block w-full border border-blue-600 text-blue-600 text-center py-2 px-4 rounded-lg hover:bg-blue-600 hover:text-white transition">
+                        Select Plan
+                    </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

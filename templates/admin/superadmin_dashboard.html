@@ -1,0 +1,423 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<style>
+    .dashboard-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+    
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">SuperAdmin Dashboard</h1>
+        <div class="text-sm text-gray-600">Last updated: {% now "DATETIME_FORMAT" %}</div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="stat-card">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-users text-white text-xl"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold">{{ total_users }}</div>
+                    <div class="text-white text-opacity-80">Total Users</div>
+                </div>
+            </div>
+            <div class="mt-2 text-sm">
+                <span class="text-green-300">+{{ new_users_today }} today</span>
+            </div>
+        </div>
+
+        <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-dollar-sign text-white text-xl"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold">${{ total_revenue|floatformat:2 }}</div>
+                    <div class="text-white text-opacity-80">Total Revenue</div>
+                </div>
+            </div>
+            <div class="mt-2 text-sm">
+                <span class="text-green-300">${{ monthly_revenue|floatformat:2 }} this month</span>
+            </div>
+        </div>
+
+        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-wifi text-white text-xl"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold">{{ total_routers }}</div>
+                    <div class="text-white text-opacity-80">Total Routers</div>
+                </div>
+            </div>
+            <div class="mt-2 text-sm">
+                <span class="text-green-300">{{ online_routers }} online</span>
+            </div>
+        </div>
+
+        <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-mobile-alt text-white text-xl"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold">{{ total_devices }}</div>
+                    <div class="text-white text-opacity-80">Connected Devices</div>
+                </div>
+            </div>
+            <div class="mt-2 text-sm">
+                <span class="text-green-300">{{ online_devices }} active</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Plan Distribution Pie Chart -->
+        <div class="dashboard-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Plan Distribution</h2>
+                <a href="{% url 'analytics_detail' 'plans' %}" class="text-blue-500 hover:text-blue-700 text-sm">
+                    View Details
+                </a>
+            </div>
+            <div class="chart-container">
+                <canvas id="planDistributionChart"></canvas>
+            </div>
+        </div>
+
+        <!-- User Growth Line Chart -->
+        <div class="dashboard-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">User Growth</h2>
+                <a href="{% url 'analytics_detail' 'users' %}" class="text-blue-500 hover:text-blue-700 text-sm">
+                    View Details
+                </a>
+            </div>
+            <div class="chart-container">
+                <canvas id="userGrowthChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Revenue Bar Chart -->
+        <div class="dashboard-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Revenue (Last 30 Days)</h2>
+                <a href="{% url 'analytics_detail' 'revenue' %}" class="text-blue-500 hover:text-blue-700 text-sm">
+                    View Details
+                </a>
+            </div>
+            <div class="chart-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Device Type Distribution -->
+        <div class="dashboard-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Device Types</h2>
+                <a href="{% url 'analytics_detail' 'devices' %}" class="text-blue-500 hover:text-blue-700 text-sm">
+                    View Details
+                </a>
+            </div>
+            <div class="chart-container">
+                <canvas id="deviceTypeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Account Type Distribution -->
+        <div class="dashboard-card">
+            <h2 class="text-xl font-semibold mb-4">Account Types</h2>
+            <div class="chart-container">
+                <canvas id="accountTypeChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Login Activity -->
+        <div class="dashboard-card">
+            <h2 class="text-xl font-semibold mb-4">Login Activity (Last 7 Days)</h2>
+            <div class="chart-container">
+                <canvas id="loginActivityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Recent Payments -->
+        <div class="dashboard-card">
+            <h2 class="text-xl font-semibold mb-4">Recent Payments</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">User</th>
+                            <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">Plan</th>
+                            <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">Amount</th>
+                            <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for payment in recent_payments %}
+                        <tr>
+                            <td class="py-2 px-3">{{ payment.user.username }}</td>
+                            <td class="py-2 px-3">{{ payment.plan.name }}</td>
+                            <td class="py-2 px-3">${{ payment.amount }}</td>
+                            <td class="py-2 px-3">{{ payment.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="py-4 text-center text-gray-500">No recent payments</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Logins -->
+        <div class="dashboard-card">
+            <h2 class="text-xl font-semibold mb-4">Recent Logins</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">User</th>
+                            <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">IP Address</th>
+                            <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">Time</th>
+                            <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for login in recent_logins %}
+                        <tr>
+                            <td class="py-2 px-3">{{ login.user.username }}</td>
+                            <td class="py-2 px-3">{{ login.ip_address }}</td>
+                            <td class="py-2 px-3">{{ login.timestamp|timesince }} ago</td>
+                            <td class="py-2 px-3">
+                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Success</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="py-4 text-center text-gray-500">No recent logins</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Color palette
+    const colors = {
+        primary: ['#4361ee', '#3a0ca3', '#4cc9f0', '#f72585', '#7209b7'],
+        success: ['#4ade80', '#22c55e', '#16a34a'],
+        warning: ['#f59e0b', '#d97706', '#b45309'],
+        danger: ['#ef4444', '#dc2626', '#b91c1c']
+    };
+
+    // Plan Distribution Pie Chart
+    const planCtx = document.getElementById('planDistributionChart').getContext('2d');
+    new Chart(planCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ plan_distribution.labels|safe }},
+            datasets: [{
+                data: {{ plan_distribution.data|safe }},
+                backgroundColor: colors.primary,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // User Growth Line Chart
+    const growthCtx = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(growthCtx, {
+        type: 'line',
+        data: {
+            labels: {{ user_growth.labels|safe }},
+            datasets: [{
+                label: 'New Users',
+                data: {{ user_growth.data|safe }},
+                borderColor: colors.primary[0],
+                backgroundColor: colors.primary[0] + '20',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Revenue Bar Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ revenue_data.labels|safe }},
+            datasets: [{
+                label: 'Revenue ($)',
+                data: {{ revenue_data.data|safe }},
+                backgroundColor: colors.success[0],
+                borderColor: colors.success[1],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Device Type Chart
+    const deviceCtx = document.getElementById('deviceTypeChart').getContext('2d');
+    new Chart(deviceCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ device_distribution.labels|safe }},
+            datasets: [{
+                data: {{ device_distribution.data|safe }},
+                backgroundColor: colors.primary,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Account Type Chart
+    const accountCtx = document.getElementById('accountTypeChart').getContext('2d');
+    new Chart(accountCtx, {
+        type: 'polarArea',
+        data: {
+            labels: {{ account_distribution.labels|safe }},
+            datasets: [{
+                data: {{ account_distribution.data|safe }},
+                backgroundColor: colors.primary,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
+        }
+    });
+
+    // Login Activity Chart
+    const loginCtx = document.getElementById('loginActivityChart').getContext('2d');
+    new Chart(loginCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Successful', 'Failed'],
+            datasets: [{
+                data: [{{ login_activity.success }}, {{ login_activity.failed }}],
+                backgroundColor: [colors.success[0], colors.danger[0]],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

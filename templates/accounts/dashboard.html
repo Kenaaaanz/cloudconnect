@@ -1,0 +1,313 @@
+<!-- templates/accounts/dashboard.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_title %}Dashboard - ConnectWise{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Welcome Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Welcome back, {{ user.first_name|default:user.username }}! 👋</h1>
+        <p class="text-gray-600 mt-2">Here's what's happening with your account today.</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Days Remaining -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900">
+                        {% if subscription %}{{ subscription.days_remaining }}{% else %}0{% endif %}
+                    </h3>
+                    <p class="text-gray-600 text-sm">Days Remaining</p>
+                </div>
+            </div>
+            {% if subscription and subscription.days_remaining <= 5 %}
+            <div class="mt-3 p-2 bg-yellow-50 rounded-lg">
+                <p class="text-yellow-800 text-xs">Your plan expires soon. <a href="{% url 'plan_selection' %}" class="font-medium underline">Renew now</a></p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Current Plan -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-tachometer-alt text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 truncate">
+                        {% if subscription %}{{ subscription.plan.name }}{% else %}No Plan{% endif %}
+                    </h3>
+                    <p class="text-gray-600 text-sm">Current Plan</p>
+                </div>
+            </div>
+            <div class="mt-2">
+                <span class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full">
+                    {% if subscription %}{{ subscription.plan.speed }}{% else %}—{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <!-- Monthly Cost -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900">
+                        Ksh{% if subscription %}{{ subscription.plan.price }}{% else %}0{% endif %}
+                    </h3>
+                    <p class="text-gray-600 text-sm">Monthly Cost</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Router Status -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-{% if router and router.is_online %}green{% else %}red{% endif %}-500">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-{% if router and router.is_online %}green{% else %}red{% endif %}-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-wifi text-{% if router and router.is_online %}green{% else %}red{% endif %}-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">
+                        {% if router %}{% if router.is_online %}Online{% else %}Offline{% endif %}{% else %}Not Setup{% endif %}
+                    </h3>
+                    <p class="text-gray-600 text-sm">Router Status</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+                    Quick Actions
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <a href="{% url 'plan_selection' %}" class="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <i class="fas fa-credit-card text-blue-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-center">Make Payment</span>
+                    </a>
+                    <a href="{% url 'router_settings' %}" class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <i class="fas fa-wifi text-green-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-center">Router Settings</span>
+                    </a>
+                    <a href="{% url 'connected_devices' %}" class="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <i class="fas fa-devices text-purple-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-center">Devices</span>
+                    </a>
+                    <a href="{% url 'profile' %}" class="flex flex-col items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
+                        <i class="fas fa-user-cog text-orange-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-center">Profile</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Payments -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-history text-gray-500 mr-2"></i>
+                        Recent Payments
+                    </h2>
+                    <a href="{% url 'payment_history' %}" class="text-blue-500 hover:text-blue-700 text-sm font-medium">
+                        View All →
+                    </a>
+                </div>
+                
+                {% if payments %}
+                <div class="space-y-3">
+                    {% for payment in payments %}
+                    <div class="flex items-center justify-between p-3 border border-gray-100 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-{% if payment.status == 'success' %}green{% elif payment.status == 'pending' %}yellow{% else %}red{% endif %}-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-{% if payment.status == 'success' %}check-circle{% elif payment.status == 'pending' %}clock{% else %}times-circle{% endif %} text-{% if payment.status == 'success' %}green{% elif payment.status == 'pending' %}yellow{% else %}red{% endif %}-500"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">{{ payment.plan.name }}</p>
+                                <p class="text-sm text-gray-500">{{ payment.created_at|date:"M d, Y" }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-gray-900">Ksh {{ payment.amount }}</p>
+                            <span class="text-xs px-2 py-1 rounded-full bg-{% if payment.status == 'success' %}green{% elif payment.status == 'pending' %}yellow{% else %}red{% endif %}-100 text-{% if payment.status == 'success' %}green{% elif payment.status == 'pending' %}yellow{% else %}red{% endif %}-800">
+                                {{ payment.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <i class="fas fa-receipt text-gray-300 text-4xl mb-3"></i>
+                    <p class="text-gray-500">No payment history yet</p>
+                    <a href="{% url 'plan_selection' %}" class="text-blue-500 hover:text-blue-700 text-sm font-medium mt-2 inline-block">
+                        Make your first payment
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Usage Statistics -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-chart-bar text-blue-500 mr-2"></i>
+                    Usage Overview
+                </h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-900">{% if router %}150 GB{% else %}—{% endif %}</div>
+                        <p class="text-sm text-gray-600">Data Used</p>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-900">{% if router %}24/7{% else %}—{% endif %}</div>
+                        <p class="text-sm text-gray-600">Uptime</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="space-y-8">
+            <!-- Account Status -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    Account Status
+                </h2>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Account Type</span>
+                        <span class="font-medium capitalize">{{ user.account_type }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Billing Cycle</span>
+                        <span class="font-medium">
+                            {% if subscription %}{{ subscription.plan.get_billing_cycle_display }}{% else %}—{% endif %}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Next Billing</span>
+                        <span class="font-medium">
+                            {% if subscription %}{{ subscription.end_date|date:"M d, Y" }}{% else %}—{% endif %}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-gray-600">Account Since</span>
+                        <span class="font-medium">{{ user.date_joined|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Router Information -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-router text-green-500 mr-2"></i>
+                    Router Information
+                </h2>
+                {% if router %}
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Model</span>
+                        <span class="font-medium">{{ router.model }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">SSID</span>
+                        <span class="font-medium">{{ router.ssid }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Connected Devices</span>
+                        <span class="font-medium">{{ router.devices.count }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-gray-600">Last Seen</span>
+                        <span class="font-medium">{{ router.last_seen|timesince }} ago</span>
+                    </div>
+                </div>
+                <a href="{% url 'router_settings' %}" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-center block">
+                    Manage Router
+                </a>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-wifi text-gray-300 text-3xl mb-2"></i>
+                    <p class="text-gray-500 mb-3">No router configured</p>
+                    <a href="{% url 'router_settings' %}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm">
+                        Setup Router
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Support Card -->
+            <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-sm p-6 text-white">
+                <h2 class="text-xl font-semibold mb-2">Need Help?</h2>
+                <p class="text-blue-100 mb-4">Our support team is here to help you 24/7</p>
+                <div class="space-y-2">
+                    <a href="#" class="flex items-center text-white hover:text-blue-200">
+                        <i class="fas fa-phone w-5 mr-2"></i>
+                        <span>+1 (800) 555-HELP</span>
+                    </a>
+                    <a href="#" class="flex items-center text-white hover:text-blue-200">
+                        <i class="fas fa-envelope w-5 mr-2"></i>
+                        <span>support@connectwise.com</span>
+                    </a>
+                    <a href="#" class="flex items-center text-white hover:text-blue-200">
+                        <i class="fas fa-comments w-5 mr-2"></i>
+                        <span>Live Chat</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-blue-50 { background-color: #eff6ff; }
+    .bg-green-50 { background-color: #f0fdf4; }
+    .bg-purple-50 { background-color: #faf5ff; }
+    .bg-orange-50 { background-color: #fff7ed; }
+    .bg-yellow-50 { background-color: #fefce8; }
+    .bg-red-50 { background-color: #fef2f2; }
+    
+    .text-blue-600 { color: #2563eb; }
+    .text-green-600 { color: #16a34a; }
+    .text-purple-600 { color: #9333ea; }
+    .text-orange-600 { color: #ea580c; }
+    .text-yellow-600 { color: #ca8a04; }
+    .text-red-600 { color: #dc2626; }
+</style>
+
+<script>
+    // Auto-refresh dashboard every 60 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            window.location.reload();
+        }, 60000);
+    });
+
+    // Smooth animations for cards
+    const cards = document.querySelectorAll('.bg-white');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+</script>
+{% endblock %}
