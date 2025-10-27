@@ -21,7 +21,7 @@
     }
   ],
   "env": {
-    "PYTHONPATH": "@",
     "DEBUG": "False"
+    "DISABLE_COLLECTSTATIC": "1"
   }
 }
