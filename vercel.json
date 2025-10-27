@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "your_project_name/wsgi.py",
+      "src": "cloudconnect/wsgi.py",
       "use": "@vercel/python"
     },
     {
@@ -17,7 +17,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "your_project_name/wsgi.py"
+      "dest": "cloudconnect/wsgi.py"
     }
   ],
   "env": {
