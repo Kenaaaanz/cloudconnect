@@ -23,8 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
+<<<<<<< HEAD
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+=======
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+>>>>>>> d4b03a456d66ef2fdda833e90e1b34dead8d29b3
 
 ALLOWED_HOSTS = [
     'localhost',
