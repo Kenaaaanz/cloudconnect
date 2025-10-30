@@ -19,7 +19,7 @@ keyring==25.6.0
 numpy==2.3.4
 openpyxl==3.1.2
 phonenumbers==9.0.17
-Pillow==10.0.1
+Pillow
 protobuf==6.33.0
 psycopg2-binary==2.9.7
 pyOpenSSL==25.3.0
