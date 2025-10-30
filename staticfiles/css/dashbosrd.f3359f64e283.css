@@ -1,0 +1,266 @@
+/* dashboard.css - Dashboard specific styling */
+.dashboard-header {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.stat-label {
+    color: var(--secondary);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.stat-trend {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+.trend-up {
+    color: var(--success);
+}
+
+.trend-down {
+    color: var(--danger);
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.action-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-color: var(--primary);
+}
+
+.action-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.action-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.action-description {
+    color: var(--secondary);
+    font-size: 0.875rem;
+}
+
+/* Recent Activity */
+.recent-activity {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.activity-list {
+    space-y: 3;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.activity-icon-success {
+    background-color: #dcfce7;
+    color: var(--success);
+}
+
+.activity-icon-warning {
+    background-color: #fef3c7;
+    color: var(--warning);
+}
+
+.activity-icon-info {
+    background-color: #dbeafe;
+    color: var(--primary);
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.activity-description {
+    color: var(--secondary);
+    font-size: 0.875rem;
+}
+
+.activity-time {
+    color: var(--secondary);
+    font-size: 0.75rem;
+    text-align: right;
+}
+
+/* Service Status */
+.service-status {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-online {
+    background-color: #dcfce7;
+    color: var(--success);
+}
+
+.status-offline {
+    background-color: #fee2e2;
+    color: var(--danger);
+}
+
+.status-maintenance {
+    background-color: #fef3c7;
+    color: var(--warning);
+}
+
+/* Usage Meter */
+.usage-meter {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.usage-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.usage-bar {
+    background-color: var(--border);
+    border-radius: 9999px;
+    height: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.usage-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+
+.usage-fill-primary {
+    background-color: var(--primary);
+}
+
+.usage-fill-warning {
+    background-color: var(--warning);
+}
+
+.usage-fill-danger {
+    background-color: var(--danger);
+}
+
+.usage-details {
+    display: flex;
+    justify-content: between;
+    font-size: 0.875rem;
+    color: var(--secondary);
+}
+
+/* Responsive Dashboard */
+@media (max-width: 768px) {
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .activity-time {
+        text-align: left;
+        margin-top: 0.5rem;
+    }
+}

@@ -5,9 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cloud Connect</title>
+    <link rel="stylesheet" href="{% static 'css/tailwind-like.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+        window.updatePreferencesUrl = "{% url 'update_preferences' %}";
+        window.updateBillingAddressUrl = "{% url 'update_billing_address' %}";
+        window.enable2faUrl = "{% url 'enable_2fa' %}";
+        window.disable2faUrl = "{% url 'disable_2fa' %}";
+        window.paystackSubscribeUrl = "{% url 'paystack_subscribe' %}";
+    </script>
+    <script src="{% static 'js/profile-functions.js' %}"></script>
+    <script src="{% static 'js/ajax-forms.js' %}"></script>
+    
     <style>
         :root {
             --primary: #4361ee;
