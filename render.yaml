@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: cloudconnect
+    env: python
+    plan: free
+    branch: main
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn cloudconnect.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cloudconnect-db
+          property: connectionString
+
+databases:
+  - name: cloudconnect-db
+    plan: free
+    databaseName: cloudconnect
+    user: cloudconnect
