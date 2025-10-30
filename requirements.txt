@@ -21,6 +21,7 @@ openpyxl==3.1.2
 phonenumbers==9.0.17
 Pillow
 protobuf==6.33.0
+psycopg2==2.9.11
 psycopg2-binary==2.9.7
 pyOpenSSL==25.3.0
 python-dateutil==2.8.2
