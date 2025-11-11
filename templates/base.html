@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud Connect</title>
+    <title>Cloud Networks</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -32,6 +32,7 @@
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             transition: all 0.3s;
+            z-index: 40;
         }
         
         .main-content {
@@ -76,55 +77,130 @@
             color: #c62828;
         }
         
+        /* Mobile sidebar styles */
         @media (max-width: 768px) {
             .sidebar {
-                width: 80px;
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
             }
             
             .main-content {
-                margin-left: 80px;
+                margin-left: 0;
             }
             
-            .sidebar .menu-text {
+            .overlay {
                 display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 35;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+            
+            .hamburger-btn {
+                display: block;
+            }
+            
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                padding: 1rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+        
+        /* Desktop styles */
+        @media (min-width: 769px) {
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+            
+            .hamburger-btn {
+                display: none;
+            }
+            
+            .mobile-header {
+                display: none;
+            }
+            
+            .overlay {
+                display: none !important;
+            }
+        }
+        
+        /* Keep your existing mobile styles */
+        @media (max-width: 768px) {
+            .sidebar .menu-text {
+                display: block; /* Changed from 'none' to keep text visible in mobile sidebar */
             }
         }
     </style>
 </head>
 <body>
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" class="overlay" onclick="toggleSidebar()"></div>
+    
     <div class="sidebar fixed left-0 top-0 p-4">
-        <div class="logo text-2xl font-bold mb-8 text-center">
-            <i class="fas fa-wifi"></i>
-            <span class="menu-text">Cloud Connect</span>
+        <!-- Mobile Header (shown only on mobile) -->
+        <div class="mobile-header">
+            <div class="flex items-center space-x-3 flex-1">
+                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                    <i class="fas fa-wifi text-purple-600 text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white">Cloud Networks</h1>
+                </div>
+            </div>
+            <button onclick="toggleSidebar()" class="text-white p-2 rounded-lg hover:bg-white hover:bg-opacity-10">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         
-        <ul class="space-y-2">
+        <!-- Desktop Logo (hidden on mobile) -->
+        <div class="hidden md:block">
+            <div class="logo text-2xl font-bold mb-8 text-center">
+                <i class="fas fa-wifi"></i>
+                <span class="menu-text">Cloud Networks</span>
+            </div>
+        </div>
+        
+        <ul class="space-y-2 mt-4 md:mt-0">
             <li>
-                <a href="{% url 'dashboard' %}" class="flex items-center p-3 rounded-lg {% if request.path == '/' %}bg-white bg-opacity-20{% endif %}">
+                <a href="{% url 'dashboard' %}" class="flex items-center p-3 rounded-lg {% if request.path == '/' %}bg-white bg-opacity-20{% endif %}" onclick="closeMobileSidebar()">
                     <i class="fas fa-home w-6 text-center"></i>
                     <span class="menu-text ml-3">Dashboard</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'plan_selection' %}" class="flex items-center p-3 rounded-lg {% if 'billing' in request.path %}bg-white bg-opacity-20{% endif %}">
+                <a href="{% url 'plan_selection' %}" class="flex items-center p-3 rounded-lg {% if 'billing' in request.path %}bg-white bg-opacity-20{% endif %}" onclick="closeMobileSidebar()">
                     <i class="fas fa-credit-card w-6 text-center"></i>
                     <span class="menu-text ml-3">Billing & Payments</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'router_settings' %}" class="flex items-center p-3 rounded-lg {% if 'router' in request.path %}bg-white bg-opacity-20{% endif %}">
+                <a href="{% url 'router_settings' %}" class="flex items-center p-3 rounded-lg {% if 'router' in request.path %}bg-white bg-opacity-20{% endif %}" onclick="closeMobileSidebar()">
                     <i class="fas fa-router w-6 text-center"></i>
                     <span class="menu-text ml-3">Router Settings</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'profile' %}" class="flex items-center p-3 rounded-lg {% if 'profile' in request.path %}bg-white bg-opacity-20{% endif %}">
+                <a href="{% url 'profile' %}" class="flex items-center p-3 rounded-lg {% if 'profile' in request.path %}bg-white bg-opacity-20{% endif %}" onclick="closeMobileSidebar()">
                     <i class="fas fa-user-cog w-6 text-center"></i>
                     <span class="menu-text ml-3">Profile</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'logout' %}" class="flex items-center p-3 rounded-lg">
+                <a href="{% url 'logout' %}" class="flex items-center p-3 rounded-lg" onclick="closeMobileSidebar()">
                     <i class="fas fa-sign-out-alt w-6 text-center"></i>
                     <span class="menu-text ml-3">Logout</span>
                 </a>
@@ -134,7 +210,11 @@
 
     <div class="main-content">
         <nav class="navbar p-4 flex justify-between items-center">
-            <div>
+            <div class="flex items-center">
+                <!-- Hamburger Button (Mobile Only) -->
+                <button onclick="toggleSidebar()" class="hamburger-btn mr-4 p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
                 <h1 class="text-xl font-semibold">
                     {% block page_title %}{% endblock %}
                 </h1>
@@ -192,6 +272,48 @@
                         }
                     });
                 });
+            }
+        });
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+            
+            // Prevent body scroll when sidebar is open
+            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+        }
+        
+        function closeMobileSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            if (window.innerWidth < 769) {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Close sidebar when pressing escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeMobileSidebar();
+            }
+        });
+        
+        // Close sidebar when clicking on a link (mobile only)
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', closeMobileSidebar);
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 769) {
+                closeMobileSidebar();
             }
         });
     </script>
