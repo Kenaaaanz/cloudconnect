@@ -31,6 +31,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '.onrender.com',
     'https://cloudconnect-sjm0.onrender.com',
+    'cloudnetworkske.com',
+    'www.cloudnetworkske.com',
 ]
 
 
